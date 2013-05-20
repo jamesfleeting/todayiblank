@@ -6,39 +6,52 @@
       pkg: grunt.file.readJSON('package.json'),
       concat: {
         options: {
-          // define a string to put between each file in the concatenated output
-          separator: ';'
+          separator: ';',
+          banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' + '<%= grunt.template.today("yyyy-mm-dd") %> */'
         },
         dist: {
-          src: ['components/jquery/jquery.js'],
-          dest: 'public/js/app.js'
+          files: {
+            'public/js/plugins.js': ['components/jquery/jquery.js']
+          }
         }
       },
       uglify: {
         options: {
-          // the banner is inserted at the top of the output
           banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n',
-          sourceMap: 'public/js/source-map.js.map'
+          //sourceMap: 'public/js/source-map.js.map'
         },
         dist: {
           files: {
+            'public/js/plugins.min.js': ['public/js/plugins.js'],
             'public/js/app.min.js': ['public/js/app.js']
           }
         }
       },
       jshint: {
-        // define the files to lint
         files: ['gruntfile.js'],
         // configure JSHint (documented at http://www.jshint.com/docs/)
         options: {
-          // more options here if you want to override JSHint defaults
           globals: {
             jQuery: true,
             console: true,
             module: true
           }
         }
-
+      },
+      less: {
+        development: {
+          files: {
+            'public/css/style.css': 'public/css/style.less'
+          }
+        },
+        production: {
+          options: {
+            yuicompress: true
+          },
+          files: {
+            'public/css/style.min.css': 'public/css/style.less'
+          }
+        }
       },
       watch: {
         files: ['<%= jshint.files %>'],
@@ -51,8 +64,9 @@
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-less');
 
     // Register the default tasks
-    grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
+    grunt.registerTask('default', ['jshint', 'concat', 'uglify', 'less']);
   };
 }());
